@@ -60,7 +60,7 @@ app.post("/api/detect-watermarks", async (req, res) => {
 
     const promptText = `
       You are a high-precision computer vision model specialized in image restoration and watermark detection.
-      Your goal is to carefully scan this image and locate the exact bounding box of any:
+      Your goal is to scan this image and locate the exact bounding box of any artificial:
       1. AI-generated icons or overlays (e.g. Google Gemini multi-colored sparkle / star cluster icon, DALL-E watermark, etc.)
       2. Watermarks (e.g. text logs, photography copyrights, camera model/date stamps, translucent overlays)
       3. Brand logos or unwanted banner text embedded into the visual stream.
@@ -72,7 +72,11 @@ app.post("/api/detect-watermarks", async (req, res) => {
       - width: width of the bounding box as % of image width (0-100)
       - height: height of the bounding box as % of image height (0-100)
 
-      Return a JSON array containing the list of detected watermarks under the key "watermarks". Include coordinates, confidence, description, and high-precision box coordinates. If nothing is found, return an empty array.
+      CRITICAL ACCURACY RULES TO AVOID FALSE POSITIVES:
+      - Never guess. Avoid FALSE POSITIVES at all costs.
+      - Do NOT detect natural features, human clothing (e.g., ties, neckties, collars, buttons, shirts, suits, designs/patterns), human faces, hair, biological features, background shadows, or normal camera light reflections/lens flare.
+      - A tie, necktie, or shirt pocket on a person's chest is regular human clothing and NOT an artificial watermark, logo, or AI sparkle.
+      - If the photograph contains no clearly added artificial text, copyrights, sparkle overlays, or superimposed logos, you MUST set "detected" to false and return "watermarks" as an empty array [].
     `;
 
     const schema = {
@@ -262,9 +266,14 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+  // Only start listening if NOT in a serverless environment (like Vercel)
+  if (process.env.VERCEL !== "1") {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  }
 }
 
 startServer();
+
+export default app;

@@ -98,7 +98,7 @@ function detectWatermarksClientHeuristic(canvas: HTMLCanvasElement): DetectionRe
     // 1. Evaluate design colors (Sparkle AI icons)
     for (let r = 0; r < gridRows; r++) {
       for (let c = 0; c < gridCols; c++) {
-        if (colorClusterGrid[r][c] > 10) {
+        if (colorClusterGrid[r][c] > 50) {
           const pad = 1;
           const minRow = Math.max(0, r - pad);
           const maxRow = Math.min(gridRows - 1, r + pad);
@@ -130,9 +130,9 @@ function detectWatermarksClientHeuristic(canvas: HTMLCanvasElement): DetectionRe
     const startTextRow = Math.floor(gridRows * 0.5);
     for (let r = startTextRow; r < gridRows; r++) {
       for (let c = 0; c < gridCols; c++) {
-        if (highContrastTextGrid[r][c] > 15) {
+        if (highContrastTextGrid[r][c] > 70) {
           let endC = c;
-          while (endC < gridCols - 1 && highContrastTextGrid[r][endC + 1] > 10) {
+          while (endC < gridCols - 1 && highContrastTextGrid[r][endC + 1] > 40) {
             endC++;
           }
 
@@ -158,38 +158,21 @@ function detectWatermarksClientHeuristic(canvas: HTMLCanvasElement): DetectionRe
       }
     }
 
-    // Default template location if absolutely no visual clusters were found
-    if (watermarks.length === 0) {
-      watermarks.push({
-        label: "Watermark Stamp Overlay",
-        type: "watermark_text",
-        confidence: 0.85,
-        x: 72,
-        y: 86,
-        width: 24,
-        height: 10
-      });
-    }
+    const isDetected = watermarks.length > 0;
 
     return {
-      detected: true,
-      summaryReport: `Detected ${watermarks.length} watermarks and sparkle overlays. Auto-restored instantly!`,
+      detected: isDetected,
+      summaryReport: isDetected
+        ? `Detected ${watermarks.length} watermarks and sparkle overlays.`
+        : "No watermarks or overlays detected.",
       watermarks
     };
   } catch (e) {
     console.error("Heuristic scan error:", e);
     return {
-      detected: true,
-      summaryReport: "Default target identified. Auto-restored instantly!",
-      watermarks: [{
-        label: "Watermark Overlay Target",
-        type: "watermark_text",
-        confidence: 0.82,
-        x: 72,
-        y: 86,
-        width: 24,
-        height: 10
-      }]
+      detected: false,
+      summaryReport: "Scanning failed or was interrupted.",
+      watermarks: []
     };
   }
 }

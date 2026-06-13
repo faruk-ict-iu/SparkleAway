@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/detect-watermarks", "destination": "/api" },
+    { "source": "/api/inpaint-ai", "destination": "/api" }
+  ]
+}

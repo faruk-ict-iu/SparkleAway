@@ -1,0 +1,6 @@
+{
+  "name": "SparkleAway",
+  "description": "An interactive computer-vision workspace to scan, segment, and remove AI icons, watermarks, and stars using context-aware pixel inpainting. Designed by Faruk Ahammed.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
